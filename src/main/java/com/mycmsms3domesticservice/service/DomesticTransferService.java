@@ -16,4 +16,8 @@ public class DomesticTransferService {
     public List<DomesticTransfer> getDomesticTransfers(){
         return domesticTransferRepository.findAll();
     }
+
+    public DomesticTransfer getSingleDomesticTransfers() {
+        return null;
+    }
 }
