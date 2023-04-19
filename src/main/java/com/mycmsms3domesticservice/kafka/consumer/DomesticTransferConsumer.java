@@ -32,8 +32,8 @@ public class DomesticTransferConsumer {
             DomesticTransferEventDTO domesticTransferEventDTO = objectMapper.readValue(message, DomesticTransferEventDTO.class);
 
             DomesticTransfer domesticTransfer = new DomesticTransfer();
-            domesticTransfer.setId(domesticTransferEventDTO.getDomesticTransferDTO().getId());
-            domesticTransfer.setDomesticTransferTrxId(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxId());
+//            domesticTransfer.setId(domesticTransferEventDTO.getDomesticTransferDTO().getId());
+//            domesticTransfer.setDomesticTransferTrxId(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxId());
             domesticTransfer.setDomesticTransferTrxName(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxName());
             domesticTransfer.setDomesticTransferTrxEmailRecipient(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxEmailRecipient());
             domesticTransfer.setDomesticTransferTrxAmount(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxAmount());
