@@ -69,25 +69,23 @@ public class DomesticTransferController {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public void createDomesticTransfer(
+    public DomesticTransfer createDomesticTransfer(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "The domestic transfer object to create.",
                     required = true,
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomesticTransfer.class))
             )
             @RequestBody DomesticTransfer domesticTransfer) {
-        domesticTransferService.createDomesticTransfer(domesticTransfer);
+        return domesticTransferService.createDomesticTransfer(domesticTransfer);
     }
 
     @PutMapping("/{domesticTransferTrxId}")
     public ResponseEntity<DomesticTransfer> updateDomesticTransfer(@PathVariable UUID domesticTransferTrxId, @RequestBody DomesticTransfer domesticTransfer){
         return domesticTransferService.updateDomesticTransfer(domesticTransferTrxId, domesticTransfer);
-
     }
 
     @DeleteMapping("/{domesticTransferTrxId}")
     public void deleteDomesticTransfer(@PathVariable UUID domesticTransferTrxId) {
         domesticTransferService.deleteDomesticTransfer(domesticTransferTrxId);
     }
-
 }
