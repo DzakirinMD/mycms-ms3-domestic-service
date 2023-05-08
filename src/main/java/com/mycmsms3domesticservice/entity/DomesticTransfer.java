@@ -4,15 +4,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
+import java.util.UUID;
 
 @Entity
 @Table(name = "domestic_transfers")
@@ -22,13 +23,14 @@ import javax.validation.constraints.Size;
 //  @RequiredArgsConstructor create constructor for all fields that are either @NonNull or final.
 public class DomesticTransfer {
 
+    //    @Id
+    //    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //    private Long id;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NonNull
-    @Column(unique=true)
-    private String domesticTransferTrxId;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    private UUID domesticTransferTrxId;
 
     @NonNull
     private String domesticTransferTrxName;
@@ -40,8 +42,7 @@ public class DomesticTransfer {
 
     private double domesticTransferTrxAmount;
 
-    public DomesticTransfer(@NonNull String domesticTransferTrxId, @NonNull String domesticTransferTrxName, @NonNull String domesticTransferTrxEmailRecipient, double domesticTransferTrxAmount) {
-        this.domesticTransferTrxId = domesticTransferTrxId;
+    public DomesticTransfer(@NonNull String domesticTransferTrxName, @NonNull String domesticTransferTrxEmailRecipient, double domesticTransferTrxAmount) {
         this.domesticTransferTrxName = domesticTransferTrxName;
         this.domesticTransferTrxEmailRecipient = domesticTransferTrxEmailRecipient;
         this.domesticTransferTrxAmount = domesticTransferTrxAmount;
