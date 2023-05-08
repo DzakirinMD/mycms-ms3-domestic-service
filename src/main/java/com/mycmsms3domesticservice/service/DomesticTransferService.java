@@ -3,6 +3,7 @@ package com.mycmsms3domesticservice.service;
 import com.mycmsms3domesticservice.entity.DomesticTransfer;
 import com.mycmsms3domesticservice.repository.DomesticTransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,26 +18,24 @@ public class DomesticTransferService {
     @Autowired
     private DomesticTransferRepository domesticTransferRepository;
 
-    public List<DomesticTransfer> getDomesticTransfers(){
+    public List<DomesticTransfer> getAllDomesticTransfers(){
         return domesticTransferRepository.findAll();
     }
 
-    public Optional<DomesticTransfer> getSingleDomesticTransfers(UUID domesticTransferTrxId) {
-        return domesticTransferRepository.findById(domesticTransferTrxId);
-    }
+    public ResponseEntity<Optional<DomesticTransfer>> getSingleDomesticTransfers(UUID domesticTransferTrxId) {
+        Optional<DomesticTransfer> optionalDomesticTransfer = domesticTransferRepository.findById(domesticTransferTrxId);
 
-    public void createDomesticTransfer(DomesticTransfer domesticTransfer) {
-        domesticTransferRepository.save(domesticTransfer);
-    }
-
-    public void deleteDomesticTransfer(UUID domesticTransferTrxId) {
-        boolean exist = domesticTransferRepository.existsById(domesticTransferTrxId);
-
-        if (!exist){
-            throw new IllegalStateException("Domestic Transaction with id " + domesticTransferTrxId + " does not exist !");
+        if (optionalDomesticTransfer.isPresent()) {
+            return ResponseEntity.ok(optionalDomesticTransfer);
+        } else {
+            String errorMessage = String.format("Domestic transfer transaction with ID %s not found.", domesticTransferTrxId);
+            return ResponseEntity.notFound().header("error-message", errorMessage).build();
         }
+    }
 
-        domesticTransferRepository.deleteById(domesticTransferTrxId);
+    public DomesticTransfer createDomesticTransfer(DomesticTransfer domesticTransfer) {
+        domesticTransferRepository.save(domesticTransfer);
+        return domesticTransfer;
     }
 
     @Transactional
@@ -52,6 +51,16 @@ public class DomesticTransferService {
         } else {
             String errorMessage = String.format("Domestic transfer transaction with ID %s not found.", domesticTransferTrxId);
             return ResponseEntity.notFound().header("error-message", errorMessage).build();
+        }
+    }
+
+    public ResponseEntity<String> deleteDomesticTransfer(UUID domesticTransferTrxId) {
+        boolean exist = domesticTransferRepository.existsById(domesticTransferTrxId);
+        if (!exist) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Domestic Transaction with id " + domesticTransferTrxId + " does not exist !");
+        } else {
+            domesticTransferRepository.deleteById(domesticTransferTrxId);
+            return ResponseEntity.ok("Domestic transfer deleted successfully.");
         }
     }
 }

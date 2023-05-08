@@ -42,4 +42,9 @@ public class DomesticTransfer {
 
     private double domesticTransferTrxAmount;
 
+    public DomesticTransfer(@NonNull String domesticTransferTrxName, @NonNull String domesticTransferTrxEmailRecipient, double domesticTransferTrxAmount) {
+        this.domesticTransferTrxName = domesticTransferTrxName;
+        this.domesticTransferTrxEmailRecipient = domesticTransferTrxEmailRecipient;
+        this.domesticTransferTrxAmount = domesticTransferTrxAmount;
+    }
 }

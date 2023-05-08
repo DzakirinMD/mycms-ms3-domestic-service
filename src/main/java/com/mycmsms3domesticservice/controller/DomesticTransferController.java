@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -38,8 +39,8 @@ public class DomesticTransferController {
      * @return a ResponseEntity with HTTP status 200 OK and a list of domestic transfer resources.
      */
     @GetMapping
-    public ResponseEntity<List<DomesticTransfer>> getDomesticTransfers() {
-        return ResponseEntity.ok(domesticTransferService.getDomesticTransfers());
+    public ResponseEntity<List<DomesticTransfer>> getAllDomesticTransfers() {
+        return ResponseEntity.ok(domesticTransferService.getAllDomesticTransfers());
     }
 
     /**
@@ -50,11 +51,8 @@ public class DomesticTransferController {
      * @throws ResourceNotFoundException if no domestic transfer with the specified ID is found.
      */
     @GetMapping("/{domesticTransferTrxId}")
-    public ResponseEntity<DomesticTransfer> getSingleDomesticTransfer(@PathVariable UUID domesticTransferTrxId) {
-        return ResponseEntity.ok(domesticTransferService
-                .getSingleDomesticTransfers(domesticTransferTrxId)
-                .orElseThrow(() -> new ResourceNotFoundException("No user with id : " + domesticTransferTrxId))
-        );
+    public ResponseEntity<Optional<DomesticTransfer>> getSingleDomesticTransfer(@PathVariable UUID domesticTransferTrxId) {
+        return domesticTransferService.getSingleDomesticTransfers(domesticTransferTrxId);
     }
 
     /**
@@ -79,13 +77,28 @@ public class DomesticTransferController {
         return domesticTransferService.createDomesticTransfer(domesticTransfer);
     }
 
+    /**
+     * Updates an existing domestic transfer with the specified ID.
+     *
+     * @param domesticTransferTrxId  The ID of the domestic transfer to update.
+     * @param domesticTransfer       The updated domestic transfer information.
+     * @return                      A ResponseEntity containing the updated domestic transfer if it exists,
+     *                              or a not found response if it doesn't.
+     */
     @PutMapping("/{domesticTransferTrxId}")
     public ResponseEntity<DomesticTransfer> updateDomesticTransfer(@PathVariable UUID domesticTransferTrxId, @RequestBody DomesticTransfer domesticTransfer){
         return domesticTransferService.updateDomesticTransfer(domesticTransferTrxId, domesticTransfer);
     }
 
+    /**
+     * Deletes an existing domestic transfer with the specified ID.
+     *
+     * @param domesticTransferTrxId  The ID of the domestic transfer to delete.
+     * @return                      A ResponseEntity indicating the status of the deletion operation,
+     *                              returning a 404 (Not Found) response if the domestic transfer doesn't exist.
+     */
     @DeleteMapping("/{domesticTransferTrxId}")
-    public void deleteDomesticTransfer(@PathVariable UUID domesticTransferTrxId) {
-        domesticTransferService.deleteDomesticTransfer(domesticTransferTrxId);
+    public ResponseEntity<String> deleteDomesticTransfer(@PathVariable UUID domesticTransferTrxId) {
+        return domesticTransferService.deleteDomesticTransfer(domesticTransferTrxId);
     }
 }
