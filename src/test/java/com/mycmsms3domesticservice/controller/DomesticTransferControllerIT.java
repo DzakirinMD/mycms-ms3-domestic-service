@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycmsms3domesticservice.entity.DomesticTransfer;
 import com.mycmsms3domesticservice.service.DomesticTransferService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,130 +37,97 @@ public class DomesticTransferControllerIT {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @AfterEach
-    public void cleanup() {
-        // Delete all created data from the database
-        underTest.getAllDomesticTransfers().forEach(domesticTransfer -> underTest.deleteDomesticTransfer(domesticTransfer.getDomesticTransferTrxId()));
-    }
+    private DomesticTransfer inputTrx1;
 
-    @Test
-    public void testGetAllDomesticTransfers() throws Exception {
+    private DomesticTransfer inputTrx2;
+
+    @BeforeEach
+    public void setup() {
         // Given
-        DomesticTransfer inputTrx1 = new DomesticTransfer("Test send money", "johndoe@example.com", 1000.00);
-        DomesticTransfer inputTrx2 = new DomesticTransfer("Test sending money", "johnwick@example.com", 500.00);
+        inputTrx1 = new DomesticTransfer("Test send money", "johndoe@example.com", 500.00);
+        inputTrx2 = new DomesticTransfer("Test sending money", "johnwick@example.com", 1000.00);
 
         // When
         underTest.createDomesticTransfer(inputTrx1);
         underTest.createDomesticTransfer(inputTrx2);
+    }
 
+    @AfterEach
+    public void cleanup() {
+        // Delete all created data from the database
+        underTest.deleteDomesticTransfer(inputTrx1.getDomesticTransferTrxId());
+        underTest.deleteDomesticTransfer(inputTrx2.getDomesticTransferTrxId());
+    }
+
+    @Test
+    public void testGetAllDomesticTransfers() throws Exception {
         // Then
         // Perform GET request to retrieve all domestic transfers
         mockMvc.perform(get("/api/v1/domestic-transfer"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].domesticTransferTrxName").value(inputTrx1.getDomesticTransferTrxName()))
-                .andExpect(jsonPath("$[0].domesticTransferTrxEmailRecipient").value(inputTrx1.getDomesticTransferTrxEmailRecipient()))
-                .andExpect(jsonPath("$[0].domesticTransferTrxAmount").value(inputTrx1.getDomesticTransferTrxAmount()))
-                .andExpect(jsonPath("$[1].domesticTransferTrxName").value(inputTrx2.getDomesticTransferTrxName()))
-                .andExpect(jsonPath("$[1].domesticTransferTrxEmailRecipient").value(inputTrx2.getDomesticTransferTrxEmailRecipient()))
-                .andExpect(jsonPath("$[1].domesticTransferTrxAmount").value(inputTrx2.getDomesticTransferTrxAmount()));
+                .andExpect(jsonPath("$[?(@.domesticTransferTrxId == '" + inputTrx1.getDomesticTransferTrxId() + "')].domesticTransferTrxName").value(inputTrx1.getDomesticTransferTrxName()))
+                .andExpect(jsonPath("$[?(@.domesticTransferTrxId == '" + inputTrx1.getDomesticTransferTrxId() + "')].domesticTransferTrxEmailRecipient").value(inputTrx1.getDomesticTransferTrxEmailRecipient()))
+                .andExpect(jsonPath("$[?(@.domesticTransferTrxId == '" + inputTrx1.getDomesticTransferTrxId() + "')].domesticTransferTrxAmount").value(inputTrx1.getDomesticTransferTrxAmount()))
+                .andExpect(jsonPath("$[?(@.domesticTransferTrxId == '" + inputTrx2.getDomesticTransferTrxId() + "')].domesticTransferTrxName").value(inputTrx2.getDomesticTransferTrxName()))
+                .andExpect(jsonPath("$[?(@.domesticTransferTrxId == '" + inputTrx2.getDomesticTransferTrxId() + "')].domesticTransferTrxEmailRecipient").value(inputTrx2.getDomesticTransferTrxEmailRecipient()))
+                .andExpect(jsonPath("$[?(@.domesticTransferTrxId == '" + inputTrx2.getDomesticTransferTrxId() + "')].domesticTransferTrxAmount").value(inputTrx2.getDomesticTransferTrxAmount()));
     }
 
     @Test
     public void testGetSingleDomesticTransfer() throws Exception {
-        // Given
-        DomesticTransfer createdTrx = new DomesticTransfer();
-        createdTrx.setDomesticTransferTrxName("Test send money");
-        createdTrx.setDomesticTransferTrxEmailRecipient("johndoe@example.com");
-        createdTrx.setDomesticTransferTrxAmount(1000.00);
-
-        // When
-        underTest.createDomesticTransfer(createdTrx);
-
         // Then
-        mockMvc.perform(get("/api/v1/domestic-transfer/{domesticTransferTrxId}", createdTrx.getDomesticTransferTrxId()))
+        mockMvc.perform(get("/api/v1/domestic-transfer/{domesticTransferTrxId}", inputTrx1.getDomesticTransferTrxId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.domesticTransferTrxName").value(createdTrx.getDomesticTransferTrxName()))
-                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(createdTrx.getDomesticTransferTrxEmailRecipient()))
-                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(createdTrx.getDomesticTransferTrxAmount()));
+                .andExpect(jsonPath("$.domesticTransferTrxName").value(inputTrx1.getDomesticTransferTrxName()))
+                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(inputTrx1.getDomesticTransferTrxEmailRecipient()))
+                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(inputTrx1.getDomesticTransferTrxAmount()));
     }
 
     @Test
     public void testCreateDomesticTransfer() throws Exception {
-        // Given
-        DomesticTransfer inputTrx = new DomesticTransfer();
-        inputTrx.setDomesticTransferTrxId(UUID.randomUUID());
-        inputTrx.setDomesticTransferTrxName("Test send money");
-        inputTrx.setDomesticTransferTrxEmailRecipient("johndoe@example.com");
-        inputTrx.setDomesticTransferTrxAmount(1000.00);
-
-        // When and Then
+        //  Then
         // Perform POST request to create a new domestic transfer
         mockMvc.perform(post("/api/v1/domestic-transfer")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(inputTrx)))
+                        .content(objectMapper.writeValueAsString(inputTrx1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.domesticTransferTrxId").isNotEmpty())
-                .andExpect(jsonPath("$.domesticTransferTrxName").value(inputTrx.getDomesticTransferTrxName()))
-                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(inputTrx.getDomesticTransferTrxEmailRecipient()))
-                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(inputTrx.getDomesticTransferTrxAmount()));
+                .andExpect(jsonPath("$.domesticTransferTrxName").value(inputTrx1.getDomesticTransferTrxName()))
+                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(inputTrx1.getDomesticTransferTrxEmailRecipient()))
+                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(inputTrx1.getDomesticTransferTrxAmount()));
     }
 
     @Test
     public void testUpdateDomesticTransfer() throws Exception {
-        // Given
-        DomesticTransfer createdTrx = new DomesticTransfer();
-        createdTrx.setDomesticTransferTrxName("Test send money");
-        createdTrx.setDomesticTransferTrxEmailRecipient("johndoe@example.com");
-        createdTrx.setDomesticTransferTrxAmount(1000.00);
-
-        // When
-        DomesticTransfer savedTrx = underTest.createDomesticTransfer(createdTrx);
-
-
-        // Updated domestic transfer data
-        DomesticTransfer updatedTrx = new DomesticTransfer();
-        updatedTrx.setDomesticTransferTrxName("Updated send money");
-        updatedTrx.setDomesticTransferTrxEmailRecipient("janedoe@example.com");
-        updatedTrx.setDomesticTransferTrxAmount(1500.00);
-
         // Then
         // Perform PUT request to update the domestic transfer
-        mockMvc.perform(put("/api/v1/domestic-transfer/{domesticTransferTrxId}", savedTrx.getDomesticTransferTrxId())
+        mockMvc.perform(put("/api/v1/domestic-transfer/{domesticTransferTrxId}", inputTrx1.getDomesticTransferTrxId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedTrx)))
+                        .content(objectMapper.writeValueAsString(inputTrx2)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.domesticTransferTrxId").value(savedTrx.getDomesticTransferTrxId().toString()))
-                .andExpect(jsonPath("$.domesticTransferTrxName").value(updatedTrx.getDomesticTransferTrxName()))
-                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(updatedTrx.getDomesticTransferTrxEmailRecipient()))
-                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(updatedTrx.getDomesticTransferTrxAmount()));
+                .andExpect(jsonPath("$.domesticTransferTrxId").value(inputTrx1.getDomesticTransferTrxId().toString()))
+                .andExpect(jsonPath("$.domesticTransferTrxName").value(inputTrx2.getDomesticTransferTrxName()))
+                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(inputTrx2.getDomesticTransferTrxEmailRecipient()))
+                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(inputTrx2.getDomesticTransferTrxAmount()));
 
         // Perform GET request to check if the domestic transfer has been updated
-        mockMvc.perform(get("/api/v1/domestic-transfer/{domesticTransferTrxId}", savedTrx.getDomesticTransferTrxId()))
+        mockMvc.perform(get("/api/v1/domestic-transfer/{domesticTransferTrxId}", inputTrx1.getDomesticTransferTrxId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.domesticTransferTrxId").value(savedTrx.getDomesticTransferTrxId().toString()))
-                .andExpect(jsonPath("$.domesticTransferTrxName").value(updatedTrx.getDomesticTransferTrxName()))
-                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(updatedTrx.getDomesticTransferTrxEmailRecipient()))
-                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(updatedTrx.getDomesticTransferTrxAmount()));
+                .andExpect(jsonPath("$.domesticTransferTrxId").value(inputTrx1.getDomesticTransferTrxId().toString()))
+                .andExpect(jsonPath("$.domesticTransferTrxName").value(inputTrx2.getDomesticTransferTrxName()))
+                .andExpect(jsonPath("$.domesticTransferTrxEmailRecipient").value(inputTrx2.getDomesticTransferTrxEmailRecipient()))
+                .andExpect(jsonPath("$.domesticTransferTrxAmount").value(inputTrx2.getDomesticTransferTrxAmount()));
     }
 
     @Test
     public void testDeleteDomesticTransfer() throws Exception {
-        // Given
-        DomesticTransfer createdTrx = new DomesticTransfer();
-        createdTrx.setDomesticTransferTrxName("Test send money");
-        createdTrx.setDomesticTransferTrxEmailRecipient("johndoe@example.com");
-        createdTrx.setDomesticTransferTrxAmount(1000.00);
-
-        // When
-        underTest.createDomesticTransfer(createdTrx);
-
         // Then
         // Perform DELETE request to delete the created domestic transfer
-        mockMvc.perform(delete("/api/v1/domestic-transfer/{domesticTransferTrxId}", createdTrx.getDomesticTransferTrxId()))
+        mockMvc.perform(delete("/api/v1/domestic-transfer/{domesticTransferTrxId}", inputTrx1.getDomesticTransferTrxId()))
                 .andExpect(status().isOk());
 
         // Try to get the deleted domestic transfer, should return 404 Not Found
-        mockMvc.perform(get("/api/v1/domestic-transfer/{domesticTransferTrxId}", createdTrx.getDomesticTransferTrxId()))
+        mockMvc.perform(get("/api/v1/domestic-transfer/{domesticTransferTrxId}", inputTrx1.getDomesticTransferTrxId()))
                 .andExpect(status().isNotFound());
 
         // Try to delete a non-existing domestic transfer, should return 404 Not Found

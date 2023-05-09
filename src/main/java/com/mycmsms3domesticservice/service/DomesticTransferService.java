@@ -18,10 +18,21 @@ public class DomesticTransferService {
     @Autowired
     private DomesticTransferRepository domesticTransferRepository;
 
+    /**
+     * Retrieves all domestic transfers.
+     *
+     * @return List of all domestic transfers
+     */
     public List<DomesticTransfer> getAllDomesticTransfers(){
         return domesticTransferRepository.findAll();
     }
 
+    /**
+     * Retrieves a single domestic transfer by its ID.
+     *
+     * @param domesticTransferTrxId the ID of the domestic transfer
+     * @return ResponseEntity containing the domestic transfer if found, or a not found error message
+     */
     public ResponseEntity<Optional<DomesticTransfer>> getSingleDomesticTransfers(UUID domesticTransferTrxId) {
         Optional<DomesticTransfer> optionalDomesticTransfer = domesticTransferRepository.findById(domesticTransferTrxId);
 
@@ -33,11 +44,24 @@ public class DomesticTransferService {
         }
     }
 
+    /**
+     * Creates a new domestic transfer.
+     *
+     * @param domesticTransfer the domestic transfer to be created
+     * @return the created domestic transfer
+     */
     public DomesticTransfer createDomesticTransfer(DomesticTransfer domesticTransfer) {
         domesticTransferRepository.save(domesticTransfer);
         return domesticTransfer;
     }
 
+    /**
+     * Updates an existing domestic transfer.
+     *
+     * @param domesticTransferTrxId the ID of the domestic transfer to be updated
+     * @param domesticTransfer the updated domestic transfer
+     * @return ResponseEntity containing the updated domestic transfer if found, or a not found error message
+     */
     @Transactional
     public ResponseEntity<DomesticTransfer> updateDomesticTransfer(UUID domesticTransferTrxId, DomesticTransfer domesticTransfer) {
         Optional<DomesticTransfer> optionalDomesticTransfer = domesticTransferRepository.findById(domesticTransferTrxId);
@@ -54,6 +78,12 @@ public class DomesticTransferService {
         }
     }
 
+    /**
+     * Deletes a domestic transfer by its ID.
+     *
+     * @param domesticTransferTrxId the ID of the domestic transfer to be deleted
+     * @return ResponseEntity containing the deletion status message or a not found error message
+     */
     public ResponseEntity<String> deleteDomesticTransfer(UUID domesticTransferTrxId) {
         boolean exist = domesticTransferRepository.existsById(domesticTransferTrxId);
         if (!exist) {
