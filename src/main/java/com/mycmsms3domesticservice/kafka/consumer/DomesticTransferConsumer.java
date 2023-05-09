@@ -20,6 +20,11 @@ public class DomesticTransferConsumer {
     @Autowired
     private DomesticTransferRepository domesticTransferRepository;
 
+    /**
+     * Kafka listener method to consume and process domestic transfer events.
+     *
+     * @param message the incoming Kafka message
+     */
     @KafkaListener(
             topics = "${spring.kafka.topic.name}",
             groupId = "${spring.kafka.consumer.group-id}"
@@ -32,8 +37,6 @@ public class DomesticTransferConsumer {
             DomesticTransferEventDTO domesticTransferEventDTO = objectMapper.readValue(message, DomesticTransferEventDTO.class);
 
             DomesticTransfer domesticTransfer = new DomesticTransfer();
-//            domesticTransfer.setId(domesticTransferEventDTO.getDomesticTransferDTO().getId());
-//            domesticTransfer.setDomesticTransferTrxId(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxId());
             domesticTransfer.setDomesticTransferTrxName(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxName());
             domesticTransfer.setDomesticTransferTrxEmailRecipient(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxEmailRecipient());
             domesticTransfer.setDomesticTransferTrxAmount(domesticTransferEventDTO.getDomesticTransferDTO().getDomesticTransferTrxAmount());
